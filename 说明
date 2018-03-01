@@ -1,5 +1,9 @@
-webapp
-  |-app //  核心文件
-  |-controller  // 控制器 
-  |-middlewarefuncs // 自定义的func（w，r）
-  |-view  // html
+
+  application
+                               app  //框架核心
+                               controller   //控制器
+                               mlddlewarefuncs  //中间件方法 |-middlewarefuncs // 自定义的func（w，r）
+                               static   //静态文件  js css
+                               storage  //储存cloud
+                               model  //
+                               view   //html 模板
