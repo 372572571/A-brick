@@ -40,6 +40,7 @@ func(a *App)Echo(htmlpath ...string){
 	}
 	http.NotFound(a.W(), a.R())
 }
+
 // 构建一个空的*App结构
 func newApp() *App{
 	return &App{}

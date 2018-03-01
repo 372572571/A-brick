@@ -15,7 +15,7 @@ const (
 type handler struct {
 	p sync.Pool
 }
-//创建一个myHandler
+// 创建一个myHandler
 func newHandler() *handler{
 	myh:=&handler{}
 	myh.p.New= func() interface{} {
@@ -27,37 +27,39 @@ func newHandler() *handler{
 // 实现serveHTTP
 // type Handler interface {
 // ServeHTTP(ResponseWriter, *Request)
-//
 
 func(h *handler)ServeHTTP(w http.ResponseWriter,r *http.Request){
-	//静态处理
+	// 静态处理
 	if serveStatic(w, r) {
-	return
+		return
 	}
+	// fmt.Println(r.Method)
+	// fmt.Println(r.Cookies())
 
-	ctx := h.p.Get().(*Context)// get获得interface数据.(*context)强制转换
+	ctx := h.p.Get().(*Context) // get获得interface数据.(*context)强制转换
 	defer h.p.Put(ctx)
-	ctx.Config(w, r)// 储存数据
+	ctx.Config(w, r) // 储存数据
 
-	controllerName, methodName := h.findControllerInfo(r)// 获得 控制器名称，方法名称
-	controllerT, ok := webRoute[controllerName]// 查找是否注册控制器，存在返回一个refkkect.type
+	controllerName, methodName := h.findControllerInfo(r) // 获得 控制器名称，方法名称
+	// fmt.Println(controllerName,methodName)
+	controllerT, ok := webRoute[controllerName] // 查找是否注册控制器，存在返回一个refkkect.type
 	if !ok {
 	http.NotFound(w, r)
-	return
+		return
 	}
-	refV := reflect.New(controllerT)// 根据路由注册的信息，创建一个新的结构
-	method := refV.MethodByName(methodName)// 查找是否有这个方法
+	refV := reflect.New(controllerT) // 根据路由注册的信息，创建一个新的结构
+	method := refV.MethodByName(methodName) // 查找是否有这个方法
 	if !method.IsValid() {
 	http.NotFound(w, r)
-	return
+		return
 	}
-	// 中间件 判断 存在则执行 注册的中间件方法
+	// 中间件.判断.存在则执行 注册的中间件方法
 	if ismiddleware,ok:=middlewareFunc[controllerName+"/"+methodName];ok{
-		ismiddleware(w,r)
+		ismiddleware(ctx.w,ctx.r)
 	}
-	controller := refV.Interface().(IApp)// 返回接口，强制转换成IApp
-	controller.Init(ctx) // 通过接口调用方法
-	method.Call(nil)
+	controller := refV.Interface().(IApp) // 返回接口,强制转换成IApp
+	controller.Init(ctx) // 通过接口调用方法.初始化controller
+	method.Call(nil) //执行对应的方法
 
 }
 // 查询对应C,M 信息
@@ -76,12 +78,15 @@ func(h *handler)findControllerInfo(r *http.Request)(controllerName string ,metho
 
 	methodName = defMethod
 	if len(pathInfo) > 2 {
+		// strings.Title(strings.ToLower(pathInfo[2]))
+		// 方法名称规范,首字母大写,其余小写
 		methodName = strings.Title(strings.ToLower(pathInfo[2]))
 		if !IsShieldfunc(methodName){
 			methodName=defMethod
+			controllerName = defController
 		}
 	}
 
-	//fmt.Println(controllerName,methodName)
+	// fmt.Println(controllerName,methodName)
 	return
 }

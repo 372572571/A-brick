@@ -2,6 +2,8 @@ package app
 
 import (
 	"net/http"
+	"reflect"
+	"strings"
 )
 
 // 禁止URL执行的方法
@@ -26,6 +28,21 @@ func SetMiddlewareFunc(cm string,f func(w http.ResponseWriter,r *http.Request)){
 	return
 }
 
+// 控制器绑定
+func SetMiddlewareCon(a IApp,f func(w http.ResponseWriter,r *http.Request)){
+	at:=reflect.TypeOf(a)
+	av:=reflect.ValueOf(a)
+	att:=reflect.Indirect(av).Type()
+	c:=strings.TrimSuffix(strings.ToLower(att.Name()),"controller")
+	// fmt.Println(c)
+	for i:=0;i<at.NumMethod();i++{
+		if IsShieldfunc(at.Method(i).Name) {
+			middlewareFunc[c+"/"+at.Method(i).Name]=f
+		}
+	}
+	// fmt.Println(middlewareFunc)
+}
+
 // 设置 禁止URL执行的方法
 func SetShieldfuncs(){
 	shieldfuncs=appLimit()
@@ -46,6 +63,7 @@ func IsShieldfunc(s string)bool{
 	}
 	return true
 }
+
 
 
 
