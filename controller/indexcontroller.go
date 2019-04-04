@@ -1,7 +1,8 @@
 package controller
 
 import (
-	"webapp/app"
+	"A-brick/app"
+	"A-brick/model"
 )
 
 type IndexController struct {
@@ -9,6 +10,8 @@ type IndexController struct {
 }
 
 func (i *IndexController) Index() {
+	m := model.ModelPool["login"]
+	m.Go("login", nil)
 	i.Data["name"] = "A brick"
 	i.Data["email"] = "372572571@qq.com"
 	i.Echo("view/index.html")

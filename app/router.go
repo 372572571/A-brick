@@ -4,7 +4,7 @@ import (
 	"reflect"
 	"strings"
 	"net/http"
-	"A.brikc/controller/common"
+	// "A.brikc/controller/common"
 )
 
 var webRoute map[string]reflect.Type = make(map[string]reflect.Type)
