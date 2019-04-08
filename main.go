@@ -4,8 +4,8 @@ import (
 	"A-brick/app"
 	"A-brick/controller"
 	"A-brick/middlewarefuncs"
-	usermodel "A-brick/model"
 	model "A-brick/model/basemodel"
+	"A-brick/model/usermodel"
 	"fmt"
 )
 
@@ -34,9 +34,11 @@ func main() {
 	// 注册中间件
 	// index/Index index=indexcontroller Index=Index
 	app.SetMiddlewareFunc("index/Index", middlewarefuncs.Index_middleware)
+	app.SetMiddlewareFunc("login/CreateUser", middlewarefuncs.Index_middleware)
 
 	// 控制器/路由注册
 	app.AutoRouter(&controller.IndexController{})
+	app.AutoRouter(&controller.LoginController{})
 
-	app.ServerRun_Http(":8082")
+	app.ServerRun_Http(port)
 }

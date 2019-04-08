@@ -2,7 +2,6 @@ package usermodel
 
 import (
 	model "A-brick/model/basemodel"
-	"fmt"
 
 	"github.com/372572571/Exercise/chanrpc"
 )
@@ -12,7 +11,7 @@ type User struct {
 	ID      uint   // 用作登陆账号
 	Name    string // 昵称
 	Account string // 用在密码
-	// CreateAt time.Time
+	Status  int
 }
 
 // LoginModel ...
@@ -30,21 +29,28 @@ func (m *LoginModel) Init() {
 
 // 注册模型方法提供服务调用 注册函数返回值 ([]interface{}, error) 或 (error)
 func (m *LoginModel) registered() {
-	m.Model.Server.Registered("login", func(ages []interface{}) ([]interface{}, error) {
-		// 尝试数据库添加操作
-		db, _ := m.GetDb()
-		if db == nil {
-			return nil, model.ErrCallFail // 数据库打开失败
-		}
-		defer db.Close() // 关闭链接
-		// db.Create(&User{ID: 103, Name: "liuyonglong", Account: "123456789"})
-		l := model.TableSize(db, "users")
-		fmt.Println(l, "表长度")
-		return nil, nil
-	})
+	// 创建随机用户服务
+	m.Model.Server.Registered("create_rand_user", m.createRandUser)
 }
 
 // Go 调用模型方法
 func (m *LoginModel) Go(key interface{}, args []interface{}) *chanrpc.Result {
 	return m.Model.Server.Fast(key, args)
+}
+
+// createRandUser 根据数据库表长度随机创建一个用户
+// 返回结果 [0]interface{}
+func (m *LoginModel) createRandUser(args []interface{}) ([]interface{}, error) {
+	// 获取数据库长度
+	db, _ := m.GetDb()
+	if db == nil {
+		return nil, model.ErrorLinkFail
+	}
+	defer db.Close() // 关闭链接
+	var l = uint(model.TableSize(db, "users") + 50000)
+	l = uint(l)
+	u := &User{ID: l, Name: "Tourist", Account: model.RandPWD(15), Status: 1}
+	db.Create(u)
+	res := []interface{}{u}
+	return res, nil
 }
