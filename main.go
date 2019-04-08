@@ -4,7 +4,8 @@ import (
 	"A-brick/app"
 	"A-brick/controller"
 	"A-brick/middlewarefuncs"
-	"A-brick/model"
+	usermodel "A-brick/model"
+	model "A-brick/model/basemodel"
 	"fmt"
 )
 
@@ -22,10 +23,13 @@ func main() {
 	fmt.Println("------------------------------------")
 
 	// 注册模型
-	model.ModelPoolAdd("login", &model.LoginModel{})
-	model.ModelPoolRun()
+	model.PoolAdd("login", &usermodel.LoginModel{})
+	// 模型服务运行
+	model.PoolRun()
+
 	// 注册静态文件服务
 	// app.Static["/static"] = "static"
+
 	app.Initmiddeware() // 中间件初始化
 	// 注册中间件
 	// index/Index index=indexcontroller Index=Index

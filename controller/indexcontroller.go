@@ -2,7 +2,7 @@ package controller
 
 import (
 	"A-brick/app"
-	"A-brick/model"
+	"A-brick/model/basemodel"
 )
 
 type IndexController struct {
