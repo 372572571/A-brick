@@ -42,15 +42,13 @@ func (m *LoginModel) Go(key interface{}, args []interface{}) *chanrpc.Result {
 // 返回结果 [0]interface{}
 func (m *LoginModel) createRandUser(args []interface{}) ([]interface{}, error) {
 	// 获取数据库长度
-	db, _ := m.GetDb()
-	if db == nil {
+	if m.Db == nil {
 		return nil, model.ErrorLinkFail
 	}
-	defer db.Close() // 关闭链接
-	var l = uint(model.TableSize(db, "users") + 50000)
+	var l = uint(model.TableSize(m.Db, "users") + 50000)
 	l = uint(l)
 	u := &User{ID: l, Name: "Tourist", Account: model.RandPWD(15), Status: 1}
-	db.Create(u)
+	m.Db.Create(u)
 	res := []interface{}{u}
 	return res, nil
 }

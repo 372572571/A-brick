@@ -5,7 +5,7 @@ import (
 	"net/http"
 	"reflect"
 	"strings"
-	"sync"
+	// "sync"
 )
 
 const (
@@ -14,13 +14,14 @@ const (
 )
 
 type handler struct {
-	p sync.Pool
+	p map[string]func() interface{}
 }
 
 // 创建一个myHandler
 func newHandler() *handler {
-	myh := &handler{}
-	myh.p.New = func() interface{} {
+	myh := new(handler)
+	myh.p = make(map[string]func() interface{})
+	myh.p["new"] = func() interface{} {
 		return &Context{} // 保存，请求和请求回应
 	}
 	return myh
@@ -33,7 +34,7 @@ func newHandler() *handler {
 func (h *handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Access-Control-Allow-Origin", "*")             //允许访问所有域
 	w.Header().Add("Access-Control-Allow-Headers", "Content-Type") //header的类型
-	w.Header().Set("content-type", "application/json")             //返回数据格式是json
+	// w.Header().Set("content-type", "application/json")             //返回数据格式是json
 	// OPTIONS 请求处理
 	if r.Method == "OPTIONS" {
 		fmt.Fprintln(w, "")
@@ -43,9 +44,9 @@ func (h *handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	if serveStatic(w, r) {
 		return
 	}
-
-	ctx := h.p.Get().(*Context) // get获得interface数据.(*context)强制转换
-	defer h.p.Put(ctx)
+	// h.p["new"].type
+	ctx := h.p["new"]().(*Context) // get获得interface数据.(*context)强制转换
+	// defer 
 	ctx.Config(w, r) // 储存数据
 
 	controllerName, methodName := h.findControllerInfo(r) // 获得 控制器名称，方法名称

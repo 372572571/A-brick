@@ -17,17 +17,10 @@ type LoginController struct {
 
 // Createuser ... 创建随机用户
 func (c *LoginController) Createuser() {
-	fmt.Println(c.R().Method)
-	// OPTIONS 请求处理
-	if c.R().Method == "OPTIONS" {
-		fmt.Fprintln(c.W(), "")
-		return
-	}
 	if c.R().Method != "POST" {
 		http.NotFound(c.W(), c.R()) // 返回404
 		return
 	}
-
 	m := model.ModelPool["login"]
 	res := m.Go("create_rand_user", nil)
 	fmt.Println(res.Get(0).(*usermodel.User))

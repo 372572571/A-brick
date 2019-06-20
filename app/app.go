@@ -1,96 +1,73 @@
 package app
 
 import (
-	"net/http"
 	"html/template"
 	"log"
+	"net/http"
 	"reflect"
 )
+
 type IApp interface {
-	Init(ctx *Context)//初始化context
+	Init(ctx *Context) //初始化context
 	W() http.ResponseWriter
 	R() *http.Request
 	Echo(htmlpath ...string)
 }
 
 type App struct {
-	ctx  *Context //存放 请求信息
-	Data map[string]interface{}//信息数据
+	ctx  *Context               //存放 请求信息
+	Data map[string]interface{} //信息数据
 }
+
 // 初始化
 func (a *App) Init(ctx *Context) {
 	a.ctx = ctx
 	a.Data = make(map[string]interface{})
 }
+
 // 获得 ResponseWriter
 func (a *App) W() http.ResponseWriter {
 	return a.ctx.w
 }
+
 // 获取Request
 func (a *App) R() *http.Request {
 	return a.ctx.r
 }
+
 // 解析模板并输出
-func(a *App)Echo(htmlpath ...string){
-	if htmlpath[0]!=""{
-		t,err:=template.ParseFiles(htmlpath[0])//解析模板
+func (a *App) Echo(htmlpath ...string) {
+	if htmlpath[0] != "" {
+		t, err := template.ParseFiles(htmlpath[0]) //解析模板
 		a.appError(err)
-		t.Execute(a.W(),a.Data)
+		t.Execute(a.W(), a.Data)
 		return
 	}
 	http.NotFound(a.W(), a.R())
 }
 
 // 构建一个空的*App结构
-func newApp() *App{
+func newApp() *App {
 	return &App{}
 }
 
-func(a *App)appError(err error){
-	if err!=nil {
+func (a *App) appError(err error) {
+	if err != nil {
 		log.Println(err)
 	}
 	// http.NotFound(a.W(), a.R())
 }
 
 // 返回App定义的函数
-func appLimit()(limitfunc map[string]int) {
+func appLimit() (limitfunc map[string]int) {
 	limitfunc = make(map[string]int)
 	app := newApp()
 	appt := reflect.TypeOf(app)
 	for i := 0; i < appt.NumMethod(); i++ {
-		limitfunc[appt.Method(i).Name]=0
+		limitfunc[appt.Method(i).Name] = 0
 	}
 	return
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 /*
 //Display
