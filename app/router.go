@@ -1,6 +1,7 @@
 package app
 
 import (
+	// "fmt"
 	"net/http"
 	"reflect"
 	"strings"
@@ -32,15 +33,15 @@ func AutoRouter(app IApp) {
 	router(refName, refT) //储存
 }
 
-// Static 静态服务容器
+// Static 静态服务容器1
 var Static map[string]string = make(map[string]string) // 静态服务
 
 func serveStatic(w http.ResponseWriter, r *http.Request) bool {
 	for prefix, static := range Static { // 循环注册静态服务
-		// fmt.Println(prefix)
 		if strings.HasPrefix(r.URL.Path, prefix) {
 			if prefix != "/storage" {
 				file := static + r.URL.Path[len(prefix):]
+				// fmt.Println(file)
 				http.ServeFile(w, r, file)
 				return true
 			}

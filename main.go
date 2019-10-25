@@ -1,3 +1,10 @@
+/*
+ * @Description: In User Settings Edit
+ * @Author: your name
+ * @Date: 2019-03-05 22:12:13
+ * @LastEditTime: 2019-09-19 21:36:08
+ * @LastEditors: Please set LastEditors
+ */
 package main
 
 import (
@@ -9,9 +16,10 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"utils"
 )
 
-var port = ":8088"
+var port = ":8099"
 var d = 0  // 显示方式
 var b = 40 // 背景色
 var f = 31 // 前景色
@@ -33,7 +41,7 @@ func main() {
 	model.PoolRun()
 
 	// 注册静态文件服务
-	app.Static["/static"] = "static"
+	app.Static["/static"] = dir + "/static"
 
 	app.Initmiddeware() // 中间件初始化
 	// 注册中间件
@@ -45,5 +53,8 @@ func main() {
 	app.AutoRouter(&controller.IndexController{})
 	app.AutoRouter(&controller.LoginController{})
 
-	app.ServerRun_Http(os.Args[1] + port)
+	// app.ServerRun_Http(os.Args[1] + port)
+	ip, _ := utils.GetLoopbackAddress()
+	fmt.Println("ip =>", ip+port)
+	app.ServerRun_Http(ip + port)
 }

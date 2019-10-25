@@ -42,11 +42,12 @@ func (h *handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	}
 	// 静态处理
 	if serveStatic(w, r) {
+		// fmt.Println("静态文件请求")
 		return
 	}
 	// h.p["new"].type
 	ctx := h.p["new"]().(*Context) // get获得interface数据.(*context)强制转换
-	// defer 
+	// defer
 	ctx.Config(w, r) // 储存数据
 
 	controllerName, methodName := h.findControllerInfo(r) // 获得 控制器名称，方法名称
